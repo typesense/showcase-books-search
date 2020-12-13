@@ -28,3 +28,4 @@ typesense-server-data
 /scripts/data/*.gz
 !/scripts/data/sample_dataset.txt.gz
 /scripts/data/*.json
+/scripts/data/*.jsonl
