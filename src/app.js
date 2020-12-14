@@ -93,24 +93,37 @@ let indexSize;
 function iconForUrl(url) {
   if (url.includes('amazon.com')) {
     return images['amazon_icon']['svg'];
+  } else if (url.includes('openlibrary')) {
+    return images['archive_icon']['svg'];
   } else {
     return images['generic_link_icon']['svg'];
+  }
+}
+
+function topMarginForUrl(url) {
+  if (url.includes('amazon.com')) {
+    return 1;
+  } else {
+    return 0;
   }
 }
 
 function urlsObjectsForBookObject(bookObject) {
   let urls = []
 
-  if (bookObject.isbn_10) {
-    urls.push(`https://www.amazon.com/dp/${bookObject.isbn_10}`)
+  if (bookObject['isbn_10']) {
+    urls.push(`https://www.amazon.com/dp/${bookObject['isbn_10']}`)
   } else if (bookObject.isbn_13) {
-    urls.push(`https://www.amazon.com/s?=${bookObject.isbn_13}`)
+    urls.push(`https://www.amazon.com/s?=${bookObject['isbn_13']}`)
   }
+
+  urls.push(`https://openlibrary.org${bookObject['key']}`)
 
   return urls.map(u => {
     return {
       url: u,
-      icon: iconForUrl(u)
+      icon: iconForUrl(u),
+      topMargin: topMarginForUrl(u)
     }
   })
 
@@ -221,7 +234,7 @@ search.addWidgets([
             </div>
             <div class="mt-auto text-right">
               {{#urls}}
-              <a href="{{ url }}" target="_blank" ><img src="{{ icon }}" alt="{{ type }}" height="14"></a>
+              <a class="ml-2" href="{{ url }}" target="_blank" ><img class="mt-{{topMargin}}" src="{{ icon }}" alt="{{ type }}" height="14"></a>
               {{/urls}}
             </div>
         `,
@@ -275,8 +288,8 @@ search.addWidgets([
   sortBy({
     container: '#sort-by',
     items: [
-      { label: 'Recent first', value: `${INDEX_NAME}` },
-      { label: 'Oldest first', value: `${INDEX_NAME}/sort/publish_date:asc` },
+      {label: 'Recent first', value: `${INDEX_NAME}`},
+      {label: 'Oldest first', value: `${INDEX_NAME}/sort/publish_date:asc`},
     ],
     cssClasses: {
       select: 'custom-select custom-select-sm',
