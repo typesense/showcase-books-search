@@ -32,8 +32,12 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       record_type = parsed_record['type']['key']
       next unless record_type == '/type/edition'
 
+      publish_date = 0
       publish_date_str = parsed_record['publish_date']
-      publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
+      if publish_date_str
+        publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
+        publish_date = Date.parse(publish_date_str).to_time.to_i
+      end
 
       {
         'title' => parsed_record['title'] +
@@ -42,7 +46,7 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         'isbn_13' => (parsed_record['isbn_13'] || []).first,
         'isbn_10' => (parsed_record['isbn_10'] || []).first,
         'num_pages' => parsed_record['number_of_pages'],
-        'publish_date' => Date.parse(publish_date_str).to_time.to_i,
+        'publish_date' => publish_date,
         'subjects' => parsed_record['subjects'] || [],
         'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
       }.compact
