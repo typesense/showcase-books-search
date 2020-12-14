@@ -1,6 +1,6 @@
 # 📚 Books Search, powered by Typesense
 
-This is a demo that showcases some of [Typesense's](https://github.com/typesense/typesense) features using a 2 Million database of books.
+This is a demo that showcases some of [Typesense's](https://github.com/typesense/typesense) features using a 28 Million database of books from <a href="https://openlibrary.org/" target="_blank">OpenLibrary</a> (Internet Archive).
 
 View it live here: [books-search.typesense.org](https://books-search.typesense.org/)
 
