@@ -26,7 +26,9 @@ typesense_client = Typesense::Client.new(
       protocol: TYPESENSE_PROTOCOL
     }
   ],
-  connection_timeout_seconds: 100
+  connection_timeout_seconds: 100,
+  retry_interval_seconds: 60,
+  num_retries: 5
 )
 
 COLLECTION_NAME = TYPESENSE_EXISTING_COLLECTION_NAME || "books_#{Time.now.utc.to_i}"
