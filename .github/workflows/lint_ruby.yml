@@ -9,4 +9,4 @@ jobs:
       with:
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - run: gem install rubocop
-    - run: robocop
+    - run: rubocop
