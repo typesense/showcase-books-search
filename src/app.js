@@ -184,7 +184,7 @@ search.addWidgets([
     },
     queryHook(query, search) {
       const modifiedQuery = queryWithoutStopWords(query);
-      if (modifiedQuery.trim() !== '') {
+      if (modifiedQuery.trim() !== '' && modifiedQuery.trim().length > 2) {
         if(debounceTimerId) {
           clearTimeout(debounceTimerId);
         }
