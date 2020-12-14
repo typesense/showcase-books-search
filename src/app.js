@@ -117,7 +117,7 @@ function urlsObjectsForBookObject(bookObject) {
     urls.push(`https://www.amazon.com/s?=${bookObject['isbn_13']}`)
   }
 
-  urls.push(`https://openlibrary.org${bookObject['key']}`)
+  urls.push(`https://openlibrary.org${bookObject['id']}`)
 
   return urls.map(u => {
     return {
