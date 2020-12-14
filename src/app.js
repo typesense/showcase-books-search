@@ -214,9 +214,7 @@ search.addWidgets([
     templates: {
       item: `
             <h6 class="text-primary font-weight-light font-letter-spacing-loose mb-0">
-              <a href="{{ link }}" target="_blank">
-                {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
-              </a>
+              {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
             </h6>
             <div class="text-muted">
               by {{#helpers.highlight}}{ "attribute": "author" }{{/helpers.highlight}}
