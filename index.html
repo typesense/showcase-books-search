@@ -11,20 +11,21 @@
 
   <link rel="stylesheet" href="./src/index.scss">
 
-  <title>book Search with Typesense</title>
+  <title>Books Search with Typesense</title>
   <meta name="description"
-        content="book Search with Typesense">
-  <meta name="keywords" content="book, search, book search, search engine, typesense"/>
+        content="Books Search with Typesense">
+  <meta name="keywords"
+        content="books, search, books search, search engine, typesense, typesense showcase, typesense demo"/>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://books-search.typesense.org">
   <meta property="og:title" content="Instant Search books with Typesense">
-  <meta name="og:description" content="Search through book from the bookNLG book database with Typesense"/>
+  <meta name="og:description" content="Search through books from the Open Library database with Typesense"/>
   <meta property="og:image" content="./images/opengraph_banner.png">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116415641-4"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116415641-6"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -34,7 +35,7 @@
 
     gtag('js', new Date());
 
-    gtag('config', 'UA-116415641-4');
+    gtag('config', 'UA-116415641-6');
   </script>
 </head>
 
@@ -46,21 +47,30 @@
         <div class="row">
           <div class="col-md">
             <h1 class="text-md-center font-serif">
-              Instant Search 2 Million books 🥘
+              Instant Search <br class="d-md-inline">
+              32 Million Books 📚
             </h1>
             <h5 class="text-md-center mt-3 font-weight-light">
               <div class="d-md-inline d-block mt-3">
                 <span style="vertical-align: text-bottom;">powered by</span>
                 <a href="https://typesense.org" target="_blank">
-                  <img src="images/typesense.svg" height="30" alt="Typesense" class="mx-2"
+                  <img src="images/typesense.svg" height="28" alt="Typesense" class="mx-2"
                        style="vertical-align: top; position: relative; top: -4px;"/>
                 </a>
               </div>
             </h5>
-            <div class="text-md-center">
-              <a class="github-button" href="https://github.com/typesense/showcase-books-search"
-                 data-color-scheme="no-preference: light; light: light; dark: dark;" data-size="normal"
-                 aria-label="View typesense/showcase-books-search on GitHub">View on Github</a>
+            <div class="d-md-flex justify-content-md-center">
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="pl-0 nav-link" href="https://github.com/typesense/showcase-books-search" target="_blank">Github</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" aria-roledescription="button" data-toggle="modal" data-target="#aboutModal"
+                     href="#">
+                    <span>About</span>
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -78,17 +88,11 @@
           <div class="mt-2">
             Try:
             <span id="example-search-terms">
-              <a role="button" class="clickable-search-term">Pizza</a>,
-              <a role="button" class="clickable-search-term">Pineapple</a>,
-              <a role="button" class="clickable-search-term">Kale</a>,
-              <a role="button" class="clickable-search-term">Oregano</a>,
-              <a role="button" class="clickable-search-term">Salad</a>,
-              <a role="button" class="clickable-search-term">Curry</a>,
-              <a role="button" class="clickable-search-term">Healthy</a>,
-              <a role="button" class="clickable-search-term">Keto</a>,
-              <a role="button" class="clickable-search-term">Low Carb</a>,
-              <a role="button" class="clickable-search-term">Steamed</a>,
-              <a role="button" class="clickable-search-term">Fried</a>
+              <a role="button" class="clickable-search-term">Guest List</a>,
+              <a role="button" class="clickable-search-term">Vanishing Half</a>,
+              <a role="button" class="clickable-search-term">Strange Planet</a>,
+              <a role="button" class="clickable-search-term">Kiley Reid</a>,
+              <a role="button" class="clickable-search-term">Holly Black</a>
             </span>
           </div>
         </div>
@@ -104,8 +108,9 @@
     </div>
     <div class="col-md">
       <div class="row d-flex justify-content-end">
+        <div id="sort-by" class="col-5 col-md-2 mt-2 mt-md-0"></div>
         <div id="stats"
-             class="col-md text-right small order-first order-md-last d-flex align-items-center justify-content-end justify-content-md-start"></div>
+             class="col-md ml-md-2 text-right small order-first order-md-last d-flex align-items-center justify-content-end justify-content-md-start px-md-0"></div>
       </div>
     </div>
   </div>
@@ -128,8 +133,15 @@
 
           <div class="row mt-2">
             <div class="col-md">
-              <h4 class="font-weight-light text-primary">Filter by Ingredients</h4>
-              <div id="ingredients-refinement-list"></div>
+              <h4 class="font-weight-light text-primary">Filter by Subject</h4>
+              <div id="subjects-refinement-list"></div>
+            </div>
+          </div>
+
+          <div class="row mt-5">
+            <div class="col-md">
+              <h4 class="font-weight-light text-primary">Filter by Authors</h4>
+              <div id="author-refinement-list"></div>
             </div>
           </div>
         </div>
@@ -171,8 +183,8 @@
           search-engine. It is an open source alternative to Algolia and an easier-to-use alternative to ElasticSearch.
         </p>
         <p>
-          The book dataset is from <a href="https://github.com/Glorf/booknlg" target="_blank">bookNLG</a> which is
-          a Cooking books Dataset for Semi-Structured Text Generation, but we're using it for search here.
+          The books dataset is from <a href="https://openlibrary.org" target="_blank">Open Library</a> which is
+          an initiative of the Internet Archive. Please contribute books metadata if you're able to.
         </p>
         <p>
           The app was built using the <a href="https://github.com/typesense/typesense-instantsearch-adapter"

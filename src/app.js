@@ -13,7 +13,6 @@ import {
   stats,
   analytics,
   refinementList,
-  menu,
   sortBy,
   currentRefinements,
 } from 'instantsearch.js/es/widgets';
@@ -92,20 +91,30 @@ let indexSize;
 })();
 
 function iconForUrl(url) {
-  return images['generic_book_link_icon']['svg'];
+  if (url.includes('amazon.com')) {
+    return images['amazon_icon']['svg'];
+  } else {
+    return images['generic_link_icon']['svg'];
+  }
 }
 
-function domainFromUrl(url) {
-  if (url == null) {
-    return null;
-  }
-  const parsedUrl = new URL(url);
-  let result = parsedUrl.hostname;
-  if(result.startsWith('www.')) {
-    result = result.replace('www.', '')
+function urlsObjectsForBookObject(bookObject) {
+  let urls = []
+
+  if (bookObject.isbn_10) {
+    urls.push(`https://www.amazon.com/dp/${bookObject.isbn_10}`)
+  } else if (bookObject.isbn_13) {
+    urls.push(`https://www.amazon.com/s?=${bookObject.isbn_13}`)
   }
 
-  return result;
+  return urls.map(u => {
+    return {
+      url: u,
+      icon: iconForUrl(u)
+    }
+  })
+
+  return urls
 }
 
 function queryWithoutStopWords(query) {
@@ -129,7 +138,7 @@ const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   //  So you can pass any parameters supported by the search endpoint below.
   //  queryBy is required.
   additionalSearchParameters: {
-    queryBy: 'title',
+    queryBy: 'title,author',
   },
 });
 const searchClient = typesenseInstantsearchAdapter.searchClient;
@@ -153,7 +162,7 @@ search.addWidgets([
     container: '#searchbox',
     showSubmit: false,
     showReset: false,
-    placeholder: 'Type in a book title',
+    placeholder: 'Type in a book title or author',
     autofocus: true,
     cssClasses: {
       input: 'form-control',
@@ -210,79 +219,30 @@ search.addWidgets([
               </a>
             </h6>
             <div class="text-muted">
-              from
-              <a class="text-muted" href="{{ link }}" target="_blank">{{ link_domain }}</a>
+              by {{#helpers.highlight}}{ "attribute": "author" }{{/helpers.highlight}}
             </div>
-            <div class="mt-2 mb-3">
-              {{ ingredient_names_display }}
-            </div>
-            <div class="mt-auto">
-              <div class="text-right">
-                <a href="#" aria-roledescription="button" class="readDirectionsButton" data-toggle="modal"><span>Read Cooking Directions</span></a> 🚀
-              </div>
-              <div class="modal fade" tabindex="-1" aria-labelledby="readDirectionsModalLabel-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h4 class="modal-title text-primary" id="readDirectionsModalLabel-1">
-                        {{ title }}<br>
-                        <small><a href="{{ link }}" target="_blank" class="small">Read on {{ link_domain }} »</a></small>
-                      </h4>
-                      <button type="button" class="close btn btn-primary" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <h5 class="mb-1">Ingredients</h6>
-                      <ul class="mt-2">
-                        {{#ingredients_with_measurements}}
-                          <li>{{ . }}</li>
-                        {{/ingredients_with_measurements}}
-                      </ul>
-                      <div class="alert alert-warning small mt-2" role="alert">
-                        Note: If the measurements for the ingredients seem off, please double-check with
-                        the <a href="{{ link }}" target="_blank">source website</a>. Happy Cooking!
-                      </div>
-                      <h5 class="mt-4">Cooking Directions</h6>
-                      <ul>
-                        {{#directions}}
-                          <li>{{ . }}</li>
-                        {{/directions}}
-                      </ul>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+            <div class="mt-auto text-right">
+              {{#urls}}
+              <a href="{{ url }}" target="_blank" ><img src="{{ icon }}" alt="{{ type }}" height="14"></a>
+              {{/urls}}
             </div>
         `,
       empty: 'No books found for <q>{{ query }}</q>. Try another search term.',
     },
     transformItems: items => {
       return items.map(item => {
-        let fixedLink = item.link
-        if (!item.link.startsWith('http')) {
-          fixedLink = `http://${item.link}`
-        }
-
         return {
           ...item,
-          ingredient_names_display: item.ingredient_names.map(i => `${i.split('')[0].toUpperCase()}${i.substring(1).toLowerCase()}`).join(', '),
-          icon: iconForUrl(item.link),
-          link: fixedLink,
-          link_domain: domainFromUrl(fixedLink)
+          urls: urlsObjectsForBookObject(item),
         };
       });
     },
   }),
   refinementList({
-    container: '#ingredients-refinement-list',
-    attribute: 'ingredient_names',
+    container: '#author-refinement-list',
+    attribute: 'author',
     searchable: true,
-    searchablePlaceholder: 'Search ingredients',
+    searchablePlaceholder: 'Search authors',
     showMore: true,
     showMoreLimit: 40,
     cssClasses: {
@@ -295,6 +255,34 @@ search.addWidgets([
       label: 'd-flex align-items-center text-capitalize',
       checkbox: 'mr-2',
     }
+  }),
+  refinementList({
+    container: '#subjects-refinement-list',
+    attribute: 'subjects',
+    searchable: true,
+    searchablePlaceholder: 'Search subjects',
+    showMore: true,
+    showMoreLimit: 40,
+    cssClasses: {
+      searchableInput: 'form-control form-control-sm mb-2 border-light-2',
+      searchableSubmit: 'd-none',
+      searchableReset: 'd-none',
+      showMore: 'btn btn-secondary btn-sm align-content-center',
+      list: 'list-unstyled',
+      count: 'badge badge-light bg-light-2 ml-2',
+      label: 'd-flex align-items-center text-capitalize',
+      checkbox: 'mr-2',
+    }
+  }),
+  sortBy({
+    container: '#sort-by',
+    items: [
+      { label: 'Recent first', value: `${INDEX_NAME}` },
+      { label: 'Oldest first', value: `${INDEX_NAME}/sort/publish_date:asc` },
+    ],
+    cssClasses: {
+      select: 'custom-select custom-select-sm',
+    },
   }),
   configure({
     hitsPerPage: 15,
@@ -330,7 +318,7 @@ function handleSearchTermClick(event) {
 
 // TODO: Update UI
 function handleFacetTermClick(event) {
-  search.helper.addDisjunctiveFacetRefinement('ingredient_names', event.currentTarget.textContent);
+  search.helper.addDisjunctiveFacetRefinement('author', event.currentTarget.textContent);
 }
 
 search.on('render', function () {
