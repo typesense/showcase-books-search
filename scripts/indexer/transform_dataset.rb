@@ -44,14 +44,12 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         'num_pages' => parsed_record['number_of_pages'],
         'publish_date' => Date.parse(publish_date_str).to_time.to_i,
         'subjects' => parsed_record['subjects'] || [],
-        'author' => parsed_record['authors'].map { |a| authors[a['key']] }.compact.first
+        'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
       }.compact
     end.compact
 
-    ap book_records_batch
-
     jsonl_string = book_records_batch.map { |r| Oj.dump(r) }.join("\n")
-    output_file.write("#{jsonl_string}\n")
+    output_file.write("#{jsonl_string}\n") unless jsonl_string.empty?
 
     puts "Processed lines upto #{line_number} ✅"
 
