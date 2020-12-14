@@ -39,17 +39,23 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         publish_date = Date.parse(publish_date_str).to_time.to_i
       end
 
-      {
-        'title' => parsed_record['title'] +
-          (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s,
-        'key' => parsed_record['key'],
-        'isbn_13' => (parsed_record['isbn_13'] || []).first,
-        'isbn_10' => (parsed_record['isbn_10'] || []).first,
-        'num_pages' => parsed_record['number_of_pages'],
-        'publish_date' => publish_date,
-        'subjects' => parsed_record['subjects'] || [],
-        'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
-      }.compact
+      begin
+        {
+          'title' => parsed_record['title'] +
+            (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s,
+          'key' => parsed_record['key'],
+          'isbn_13' => (parsed_record['isbn_13'] || []).first,
+          'isbn_10' => (parsed_record['isbn_10'] || []).first,
+          'num_pages' => parsed_record['number_of_pages'],
+          'publish_date' => publish_date,
+          'subjects' => parsed_record['subjects'] || [],
+          'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
+        }.compact
+      rescue StandardError => e
+        ap parsed_record
+        ap e
+        raise
+      end
     end.compact
 
     jsonl_string = book_records_batch.map { |r| Oj.dump(r) }.join("\n")
