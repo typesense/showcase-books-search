@@ -15,13 +15,19 @@ OUTPUT_FILE = ENV['OUTPUT_FILE'] || './scripts/data/transformed_dataset.json'
 def determine_publish_date(parsed_record)
   publish_date = 0
   begin
-    publish_date_str = parsed_record['publish_date']
+    publish_date_str = parsed_record['publish_date'].to_s.strip
     if publish_date_str
       publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
       publish_date = Date.parse(publish_date_str).to_time.to_i
     end
   rescue Date::Error => e
     puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
+  rescue StandardError => e
+    puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
+    ap parsed_record
+    ap e
+    ap e.backtrace.join("\n")
+    raise
   end
   publish_date
 end
@@ -50,7 +56,7 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
     book_records_batch = lines.map do |line|
       line_number += 1
 
-      parsed_record = Oj.load(line.split("\t")[4])
+      parsed_record = Oj.load(line.split("\t")[4], mode: :compat)
       record_type = parsed_record['type']['key']
       next unless record_type == '/type/edition'
 
