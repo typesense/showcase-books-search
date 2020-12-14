@@ -350,7 +350,6 @@ $(function () {
 
   // Handle example search terms
   $('.clickable-search-term').on('click', handleSearchTermClick);
-  $('.clickable-facet-term').on('click', handleFacetTermClick);
 
   // Clear refinements, when searching
   $searchBox.on('keydown', event => {
