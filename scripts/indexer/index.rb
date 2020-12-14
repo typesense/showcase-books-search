@@ -14,6 +14,8 @@ TYPESENSE_PORT = ENV['TYPESENSE_PORT']
 TYPESENSE_PROTOCOL = ENV['TYPESENSE_PROTOCOL']
 TYPESENSE_ADMIN_API_KEY = ENV['TYPESENSE_ADMIN_API_KEY']
 TYPESENSE_COLLECTION_ALIAS = ENV['TYPESENSE_COLLECTION_NAME']
+TYPESENSE_EXISTING_COLLECTION_NAME = ENV['TYPESENSE_EXISTING_COLLECTION_NAME']
+UPDATE_ALIAS = ENV['UPDATE_COLLECTION_ALIAS'] == 'true'
 
 typesense_client = Typesense::Client.new(
   api_key: TYPESENSE_ADMIN_API_KEY,
@@ -27,45 +29,53 @@ typesense_client = Typesense::Client.new(
   connection_timeout_seconds: 100
 )
 
-COLLECTION_NAME = "books_#{Time.now.utc.to_i}"
-schema = {
-  'name' => COLLECTION_NAME,
-  'fields' => [
-    {
-      'name' => 'title',
-      'type' => 'string'
-    },
-    {
-      'name' => 'author',
-      'type' => 'string',
-      'facet' => true,
-      'optional' => true
-    },
-    {
-      'name' => 'num_pages',
-      'type' => 'int32',
-      'facet' => true,
-      'optional' => true
-    },
-    {
-      'name' => 'subjects',
-      'type' => 'string[]',
-      'facet' => true,
-      'optional' => true
-    },
-    {
-      'name' => 'publish_date',
-      'type' => 'int64',
-      'facet' => true
-    }
-  ],
-  'default_sorting_field' => 'publish_date'
-}
+COLLECTION_NAME = if TYPESENSE_EXISTING_COLLECTION_NAME.empty?
+                    "books_#{Time.now.utc.to_i}"
+                  else
+                    TYPESENSE_EXISTING_COLLECTION_NAME
+                  end
 
-puts "Populating new collection in Typesense #{COLLECTION_NAME}"
-puts 'Creating schema'
+if TYPESENSE_EXISTING_COLLECTION_NAME.empty?
+  schema = {
+    'name' => COLLECTION_NAME,
+    'fields' => [
+      {
+        'name' => 'title',
+        'type' => 'string'
+      },
+      {
+        'name' => 'author',
+        'type' => 'string',
+        'facet' => true,
+        'optional' => true
+      },
+      {
+        'name' => 'num_pages',
+        'type' => 'int32',
+        'facet' => true,
+        'optional' => true
+      },
+      {
+        'name' => 'subjects',
+        'type' => 'string[]',
+        'facet' => true,
+        'optional' => true
+      },
+      {
+        'name' => 'publish_date',
+        'type' => 'int64',
+        'facet' => true
+      }
+    ],
+    'default_sorting_field' => 'publish_date'
+  }
 
-typesense_client.collections.create(schema)
+  puts "Populating new collection in Typesense #{COLLECTION_NAME}"
+  puts 'Creating schema'
+  typesense_client.collections.create(schema)
+else
+  puts "Populating existing collection in Typesense #{COLLECTION_NAME}"
+end
 
 puts 'Adding records: '
 
@@ -87,18 +97,20 @@ File.foreach(JSONL_DATA_FILE).each_slice(BATCH_SIZE) do |lines|
   break if line_number >= MAX_BATCHES * BATCH_SIZE
 end
 
-old_collection_name = nil
+if UPDATE_ALIAS
+  old_collection_name = nil
 
-begin
-  old_collection_name = typesense_client.aliases[TYPESENSE_COLLECTION_ALIAS].retrieve['collection_name']
-rescue Typesense::Error::ObjectNotFound
-  # Do nothing
-end
+  begin
+    old_collection_name = typesense_client.aliases[TYPESENSE_COLLECTION_ALIAS].retrieve['collection_name']
+  rescue Typesense::Error::ObjectNotFound
+    # Do nothing
+  end
 
-puts "Update alias #{TYPESENSE_COLLECTION_ALIAS} -> #{COLLECTION_NAME}"
-typesense_client.aliases.upsert(TYPESENSE_COLLECTION_ALIAS, { 'collection_name' => COLLECTION_NAME })
+  puts "Update alias #{TYPESENSE_COLLECTION_ALIAS} -> #{COLLECTION_NAME}"
+  typesense_client.aliases.upsert(TYPESENSE_COLLECTION_ALIAS, { 'collection_name' => COLLECTION_NAME })
 
-if old_collection_name
-  puts "Deleting old collection #{old_collection_name}"
-  typesense_client.collections[old_collection_name].delete
+  if old_collection_name
+    puts "Deleting old collection #{old_collection_name}"
+    typesense_client.collections[old_collection_name].delete
+  end
 end
