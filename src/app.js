@@ -232,7 +232,9 @@ search.addWidgets([
     templates: {
       item: `
             <h6 class="text-primary font-weight-light font-letter-spacing-loose mb-0">
-              {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
+              <a href="https://openlibrary.org/{{ id }}" target="_blank">
+                {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
+              </a>
             </h6>
             <div class="text-muted">
               by
