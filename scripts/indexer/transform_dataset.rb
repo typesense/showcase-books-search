@@ -39,6 +39,9 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         publish_date = Date.parse(publish_date_str).to_time.to_i
       end
 
+      puts "Skipping record with no title #{parsed_record['key']}"
+      next if parsed_record['title'].nil?
+
       begin
         {
           'title' => parsed_record['title'] +
@@ -54,6 +57,7 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       rescue StandardError => e
         ap parsed_record
         ap e
+        ap e.backtrace.join("\n")
         raise
       end
     end.compact
