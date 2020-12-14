@@ -114,7 +114,7 @@ function urlsObjectsForBookObject(bookObject) {
   if (bookObject['isbn_10']) {
     urls.push(`https://www.amazon.com/dp/${bookObject['isbn_10']}`)
   } else if (bookObject.isbn_13) {
-    urls.push(`https://www.amazon.com/s?=${bookObject['isbn_13']}`)
+    urls.push(`https://www.amazon.com/s?k=${bookObject['isbn_13']}`)
   }
 
   urls.push(`https://openlibrary.org${bookObject['id']}`)
