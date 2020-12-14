@@ -1,9 +1,5 @@
 name: lint_ruby
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [pull_request, push]
 jobs:
   lint_ruby:
     runs-on: ubuntu-latest
