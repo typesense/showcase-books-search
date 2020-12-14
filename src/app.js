@@ -170,6 +170,8 @@ const search = instantsearch({
   },
 });
 
+let debounceTimerId;
+
 search.addWidgets([
   searchBox({
     container: '#searchbox',
@@ -183,7 +185,10 @@ search.addWidgets([
     queryHook(query, search) {
       const modifiedQuery = queryWithoutStopWords(query);
       if (modifiedQuery.trim() !== '') {
-        search(modifiedQuery);
+        if(debounceTimerId) {
+          clearTimeout(debounceTimerId);
+        }
+        debounceTimerId = setTimeout(() => search(modifiedQuery), 250);
       }
     },
   }),
