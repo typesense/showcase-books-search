@@ -100,7 +100,7 @@ File.foreach(JSONL_DATA_FILE).each_slice(BATCH_SIZE) do |lines|
     puts "Indexed lines upto #{line_number} ✅"
   else
     ap failed_items
-    raise 'Indexing error'
+    puts 'Indexing error'
   end
 
   break if line_number >= MAX_BATCHES * BATCH_SIZE
