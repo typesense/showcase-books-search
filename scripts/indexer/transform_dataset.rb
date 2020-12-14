@@ -12,6 +12,28 @@ DATA_FILE = ENV['DATA_FILE'] || './scripts/data/sample_dataset.txt.gz'
 AUTHORS_FILE = ENV['AUTHORS_FILE'] || './scripts/data/authors.jsonl'
 OUTPUT_FILE = ENV['OUTPUT_FILE'] || './scripts/data/transformed_dataset.json'
 
+def determine_publish_date(parsed_record)
+  publish_date = 0
+  begin
+    publish_date_str = parsed_record['publish_date']
+    if publish_date_str
+      publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
+      publish_date = Date.parse(publish_date_str).to_time.to_i
+    end
+  rescue Date::Error => e
+    puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
+  end
+  publish_date
+end
+
+def determine_title(parsed_record)
+  title = parsed_record['title'] || (parsed_record['other_titles'] || []).first
+  return if title.nil?
+
+  title.to_s +
+    (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s
+end
+
 puts 'Loading authors file'
 authors = {}
 File.foreach(AUTHORS_FILE) do |line|
@@ -32,18 +54,10 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       record_type = parsed_record['type']['key']
       next unless record_type == '/type/edition'
 
-      publish_date = 0
-      begin
-        publish_date_str = parsed_record['publish_date']
-        if publish_date_str
-          publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
-          publish_date = Date.parse(publish_date_str).to_time.to_i
-        end
-      rescue Date::Error => e
-        puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
-      end
+      publish_date = determine_publish_date(parsed_record)
+      title = determine_title(parsed_record)
 
-      if parsed_record['title'].nil?
+      if title.nil?
         puts 'Skipping record with no title...'
         ap parsed_record
         puts line
@@ -52,8 +66,7 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
 
       begin
         {
-          'title' => parsed_record['title'] +
-            (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s,
+          'title' => title,
           'key' => parsed_record['key'],
           'isbn_13' => (parsed_record['isbn_13'] || []).first,
           'isbn_10' => (parsed_record['isbn_10'] || []).first,
