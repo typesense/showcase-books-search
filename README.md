@@ -19,6 +19,9 @@ Typesense Adapter for InstantSearch.js</a> and is hosted on S3, with CloudFront 
 The search backend is powered by a geo-distributed 3-node Typesense cluster running on <a href="https://cloud.typesense.org" target="_blank">Typesense Cloud</a>,
 with nodes in Oregon, Frankfurt and Mumbai.
 
+The dataset has ~28M records, takes up 6.8GB on disk and 14.3GB in RAM when indexed in Typesense.
+Takes ~3 hours to index these 28M records.
+
 ## Repo structure
 
 - `src/` and `index.html` - contain the frontend UI components, built with <a href="https://github.com/typesense/typesense-instantsearch-adapter" target="_blank">Typesense Adapter for InstantSearch.js</a>
