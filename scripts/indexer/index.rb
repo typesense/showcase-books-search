@@ -29,13 +29,11 @@ typesense_client = Typesense::Client.new(
   connection_timeout_seconds: 100
 )
 
-COLLECTION_NAME = if TYPESENSE_EXISTING_COLLECTION_NAME.empty?
-                    "books_#{Time.now.utc.to_i}"
-                  else
-                    TYPESENSE_EXISTING_COLLECTION_NAME
-                  end
+COLLECTION_NAME = TYPESENSE_EXISTING_COLLECTION_NAME || "books_#{Time.now.utc.to_i}"
 
-if TYPESENSE_EXISTING_COLLECTION_NAME.empty?
+if TYPESENSE_EXISTING_COLLECTION_NAME
+  puts "Populating existing collection in Typesense #{COLLECTION_NAME}"
+else
   schema = {
     'name' => COLLECTION_NAME,
     'fields' => [
@@ -73,8 +71,6 @@ if TYPESENSE_EXISTING_COLLECTION_NAME.empty?
   puts "Populating new collection in Typesense #{COLLECTION_NAME}"
   puts 'Creating schema'
   typesense_client.collections.create(schema)
-else
-  puts "Populating existing collection in Typesense #{COLLECTION_NAME}"
 end
 
 puts 'Adding records: '
