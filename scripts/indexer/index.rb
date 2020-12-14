@@ -94,7 +94,7 @@ File.foreach(JSONL_DATA_FILE).each_slice(BATCH_SIZE) do |lines|
   rescue Oj::ParseError
     puts "Oj::ParseError for #{r}"
     nil
-  end.chomp
+  end.compact
   failed_items = parsed_import_results.filter { |r| r['success'] == false }
   if failed_items.empty?
     puts "Indexed lines upto #{line_number} ✅"
