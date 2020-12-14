@@ -37,8 +37,9 @@ yarn run typesenseServer
 
 ln -s .env.development .env
 
-BATCH_SIZE=1000 yarn run indexer:transformDataset # This will output a JSONL file
-yarn run indexer:importToTypesense # This will import the JSONL file into Typesense
+yarn run indexer:extractAuthors # This will output an authors.jsonl file
+yarn run indexer:transformDataset # This will output a transformed_dataset.json file
+BATCH_SIZE=100000 yarn run indexer:importToTypesense # This will import the JSONL file into Typesense
 
 yarn start
 ```
