@@ -16,7 +16,7 @@ def determine_publish_date(parsed_record)
   publish_date = 0
   begin
     publish_date_str = parsed_record['publish_date'].to_s.strip
-    if publish_date_str
+    unless publish_date_str.empty?
       publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
       publish_date = Date.parse(publish_date_str).to_time.to_i
     end
