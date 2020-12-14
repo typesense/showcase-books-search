@@ -230,7 +230,8 @@ search.addWidgets([
               {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
             </h6>
             <div class="text-muted">
-              by {{#helpers.highlight}}{ "attribute": "author" }{{/helpers.highlight}}
+              by
+              <a role="button" class="clickable-search-term">{{#helpers.highlight}}{ "attribute": "author" }{{/helpers.highlight}}</a>
             </div>
             <div class="mt-auto text-right">
               {{#urls}}
@@ -327,14 +328,9 @@ function handleSearchTermClick(event) {
   search.helper.setQuery($searchBox.val()).search();
 }
 
-// TODO: Update UI
-function handleFacetTermClick(event) {
-  search.helper.addDisjunctiveFacetRefinement('author', event.currentTarget.textContent);
-}
-
 search.on('render', function () {
-  // Make ingredient names clickable
-  $('#hits .clickable-facet-term').on('click', handleFacetTermClick);
+  // Make author names clickable
+  $('#hits .clickable-search-term').on('click', handleSearchTermClick);
 
   // Read directions button
   $('.readDirectionsButton').on('click', event => {
