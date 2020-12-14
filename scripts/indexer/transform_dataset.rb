@@ -32,17 +32,18 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       record_type = parsed_record['type']['key']
       next unless record_type == '/type/edition'
 
-      publish_date = 0
-      publish_date_str = parsed_record['publish_date']
-      if publish_date_str
-        publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
-        publish_date = Date.parse(publish_date_str).to_time.to_i
-      end
-
-      puts "Skipping record with no title #{parsed_record['key']}"
-      next if parsed_record['title'].nil?
-
       begin
+        publish_date = 0
+        publish_date_str = parsed_record['publish_date']
+        if publish_date_str
+          publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
+          publish_date = Date.parse(publish_date_str).to_time.to_i
+        end
+
+        puts 'Skipping record with no title...'
+        ap parsed_record
+        next if parsed_record['title'].nil?
+
         {
           'title' => parsed_record['title'] +
             (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s,
