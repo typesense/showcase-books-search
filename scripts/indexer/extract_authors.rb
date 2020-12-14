@@ -23,16 +23,16 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       record_key = parsed_record['key']
       record_name = parsed_record['name']
 
-      if record_type == '/type/author'
-        {
-          'key' => record_key,
-          'name' => record_name
-        }
-      end
+      next unless record_type == '/type/author'
+
+      {
+        'key' => record_key,
+        'name' => record_name
+      }
     end.compact
 
     jsonl_string = authors_records_batch.map { |r| Oj.dump(r) }.join("\n")
-    output_file.write("#{jsonl_string}\n")
+    output_file.write("#{jsonl_string}\n") unless jsonl_string.empty?
 
     puts "Processed lines upto #{line_number} ✅"
 

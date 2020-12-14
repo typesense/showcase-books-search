@@ -33,22 +33,19 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
       next unless record_type == '/type/edition'
 
       publish_date_str = parsed_record['publish_date']
-      if publish_date_str.length == 4 # Only has a year
-        publish_date_str = "#{publish_date_str}-01-01"
-      end
+      publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
 
       {
-        'title' => parsed_record['title'],
-        'subtitle' => parsed_record['subtitle'],
+        'title' => parsed_record['title'] +
+          (parsed_record['subtitle'].nil? ? '' : " - #{parsed_record['subtitle']}").to_s,
         'key' => parsed_record['key'],
         'isbn_13' => (parsed_record['isbn_13'] || []).first,
         'isbn_10' => (parsed_record['isbn_10'] || []).first,
-        'languages' => (parsed_record['languages'] || []).map { |l| l['key'].split('/').last }.compact,
         'num_pages' => parsed_record['number_of_pages'],
         'publish_date' => Date.parse(publish_date_str).to_time.to_i,
         'subjects' => parsed_record['subjects'] || [],
-        'authors' => parsed_record['authors'].map { |a| authors[a['key']] }.compact
-      }
+        'author' => parsed_record['authors'].map { |a| authors[a['key']] }.compact.first
+      }.compact
     end.compact
 
     ap book_records_batch

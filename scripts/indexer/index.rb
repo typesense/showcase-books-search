@@ -32,24 +32,34 @@ schema = {
   'name' => COLLECTION_NAME,
   'fields' => [
     {
-      'name' => 'book_id',
-      'type' => 'int32'
-    },
-    {
       'name' => 'title',
       'type' => 'string'
     },
     {
-      'name' => 'ingredient_names',
-      'type' => 'string[]',
-      'facet' => true
+      'name' => 'author',
+      'type' => 'string',
+      'facet' => true,
+      'optional' => true
     },
     {
-      'name' => 'directions',
-      'type' => 'string[]'
+      'name' => 'num_pages',
+      'type' => 'int32',
+      'facet' => true,
+      'optional' => true
+    },
+    {
+      'name' => 'subjects',
+      'type' => 'string[]',
+      'facet' => true,
+      'optional' => true
+    },
+    {
+      'name' => 'publish_date',
+      'type' => 'int64',
+      'facet' => true
     }
   ],
-  'default_sorting_field' => 'book_id'
+  'default_sorting_field' => 'publish_date'
 }
 
 puts "Populating new collection in Typesense #{COLLECTION_NAME}"
@@ -65,7 +75,7 @@ File.foreach(JSONL_DATA_FILE).each_slice(BATCH_SIZE) do |lines|
 
   line_number += BATCH_SIZE
 
-  parsed_import_results = raw_import_results.split("\n").map{|r| Oj.load(r)}
+  parsed_import_results = raw_import_results.split("\n").map { |r| Oj.load(r) }
   failed_items = parsed_import_results.filter { |r| r['success'] == false }
   if failed_items.empty?
     puts "Indexed lines upto #{line_number} ✅"
