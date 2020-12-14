@@ -43,10 +43,12 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
       end
 
-      puts 'Skipping record with no title...'
-      ap parsed_record
-      puts line
-      next if parsed_record['title'].nil?
+      if parsed_record['title'].nil?
+        puts 'Skipping record with no title...'
+        ap parsed_record
+        puts line
+        next
+      end
 
       begin
         {
