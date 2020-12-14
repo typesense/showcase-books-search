@@ -7,6 +7,7 @@ require 'amazing_print'
 
 BATCH_SIZE = (ENV['BATCH_SIZE'] || 1000).to_i
 MAX_BATCHES = (ENV['MAX_BATCHES'] || 200_000).to_i
+START_LINE = (ENV['START_LINE'] || 1).to_i
 JSONL_DATA_FILE = ENV['JSONL_DATA_FILE'] || './scripts/data/transformed_dataset.json'
 
 TYPESENSE_HOST = ENV['TYPESENSE_HOST']
@@ -79,11 +80,21 @@ puts 'Adding records: '
 
 line_number = 0
 File.foreach(JSONL_DATA_FILE).each_slice(BATCH_SIZE) do |lines|
-  raw_import_results = typesense_client.collections[COLLECTION_NAME].documents.import(lines.join("\n"))
-
   line_number += BATCH_SIZE
 
-  parsed_import_results = raw_import_results.split("\n").map { |r| Oj.load(r) }
+  if line_number < START_LINE
+    puts "Skipping lines upto #{line_number} (START_LINE=#{START_LINE})"
+    next
+  end
+
+  raw_import_results = typesense_client.collections[COLLECTION_NAME].documents.import(lines.join("\n"))
+
+  parsed_import_results = raw_import_results.split("\n").map do |r|
+    Oj.load(r)
+  rescue Oj::ParseError
+    puts "Oj::ParseError for #{r}"
+    nil
+  end.chomp
   failed_items = parsed_import_results.filter { |r| r['success'] == false }
   if failed_items.empty?
     puts "Indexed lines upto #{line_number} ✅"
