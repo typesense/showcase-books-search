@@ -20,7 +20,7 @@ def determine_publish_date(parsed_record)
       publish_date_str = "#{publish_date_str}-01-01" if publish_date_str.length == 4 # Only has a year
       publish_date = Date.parse(publish_date_str).to_time.to_i
     end
-  rescue Date::Error => e
+  rescue Date::Error
     puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
   rescue StandardError => e
     puts "Couldn't parse date #{parsed_record['publish_date']}, setting to 0"
