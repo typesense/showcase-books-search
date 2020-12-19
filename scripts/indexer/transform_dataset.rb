@@ -74,9 +74,7 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
         {
           'id' => parsed_record['key'],
           'title' => title,
-          'isbn_13' => (parsed_record['isbn_13'] || []).first,
           'isbn_10' => (parsed_record['isbn_10'] || []).first,
-          'num_pages' => parsed_record['number_of_pages'],
           'publish_date' => publish_date,
           'subjects' => parsed_record['subjects'] || [],
           'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
