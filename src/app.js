@@ -31,6 +31,7 @@ let TYPESENSE_SERVER_CONFIG = {
     },
   ],
   numRetries: 8,
+  useServerSideSearchCache: true,
 };
 
 // [2, 3].forEach(i => {

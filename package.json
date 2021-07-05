@@ -15,27 +15,28 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "devDependencies": {
-    "babel-eslint": "10.0.3",
-    "eslint": "5.7.0",
-    "eslint-config-prettier": "3.6.0",
-    "eslint-plugin-import": "2.19.1",
-    "eslint-plugin-prettier": "3.1.2",
-    "parcel-bundler": "1.12.4",
-    "prettier": "1.19.1",
-    "sass": "^1.26.11"
+    "@babel/core": "7.14.6",
+    "@babel/eslint-parser": "7.14.7",
+    "eslint": "7.30.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.23.4",
+    "eslint-plugin-prettier": "3.4.0",
+    "parcel-bundler": "1.12.5",
+    "prettier": "2.3.2",
+    "sass": "^1.35.1"
   },
   "dependencies": {
-    "@babel/runtime": "^7.10.2",
-    "@popperjs/core": "^2.5.3",
-    "bootstrap": "^4.5.2",
-    "dotenv": "^8.2.0",
-    "fast-json-stringify": "^2.2.9",
-    "instantsearch.js": "^4.8.3",
-    "jquery": "^3.5.1",
-    "lodash": "^4.17.20",
-    "papaparse": "^5.3.0",
+    "@babel/runtime": "^7.14.6",
+    "@popperjs/core": "^2.9.2",
+    "bootstrap": "^4.6.0",
+    "dotenv": "^10.0.0",
+    "fast-json-stringify": "^2.7.7",
+    "instantsearch.js": "^4.24.3",
+    "jquery": "^3.6.0",
+    "lodash": "^4.17.21",
+    "papaparse": "^5.3.1",
     "popper.js": "^1.16.1",
-    "typesense": "^0.11.1",
-    "typesense-instantsearch-adapter": "^1.0.0"
+    "typesense": "^0.14.0-1",
+    "typesense-instantsearch-adapter": "^2.0.0-0"
   }
 }
