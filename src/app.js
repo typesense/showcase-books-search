@@ -153,6 +153,7 @@ const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   //  queryBy is required.
   additionalSearchParameters: {
     queryBy: 'title,author',
+    useCache: true
   },
 });
 const searchClient = typesenseInstantsearchAdapter.searchClient;
