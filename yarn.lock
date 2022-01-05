@@ -6217,10 +6217,10 @@ typedarray@^0.0.6:
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typesense-instantsearch-adapter@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/typesense-instantsearch-adapter/-/typesense-instantsearch-adapter-2.2.0.tgz#6d42ba7293490bdf02854f454ed5b7db16d89b2f"
-  integrity sha512-VRmE2cnQhNZc/SgunvHCWUa6AtzDh+Li7DiJLAwC+0JT30y31TBr4sHZ1U5SOtk6OwOhWyyZU8JvZhB0GCrNaA==
+typesense-instantsearch-adapter@^2.3.0-0:
+  version "2.3.0-0"
+  resolved "https://registry.yarnpkg.com/typesense-instantsearch-adapter/-/typesense-instantsearch-adapter-2.3.0-0.tgz#feea5e39713685a9ffe8187e08eb8abc5cf1225e"
+  integrity sha512-Kcp5ah1tt3K8SUEEn0TnJWTKt/Kwszg6sE5JaT8UbLkYvgAb+geGQFEqJHeR/3yosdVaJz2QI8H4aXt8jNfngw==
   dependencies:
     typesense "^0.14.0"
 
@@ -6232,10 +6232,10 @@ typesense@^0.14.0:
     axios "^0.21.1"
     loglevel "^1.7.1"
 
-typesense@^1.0.3-2:
-  version "1.0.3-2"
-  resolved "https://registry.yarnpkg.com/typesense/-/typesense-1.0.3-2.tgz#ede2d038f3c5c4b56a4651c49a15590402e9699c"
-  integrity sha512-jXLvx+Lq2qijFj7sPzCltRS1UvyFztt+7r6tKtfTNIcS2FsRx2X+lK8Wn+uzA76Q+98cFr8QfNdfZ/ms8OBtEA==
+typesense@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/typesense/-/typesense-1.1.2.tgz#f3357889247a56b33e047115e15ccbd87c185cc5"
+  integrity sha512-H5SmXCWhesL71YLqKg3i6yRfklsvlV3RQOCvdvMlkD84Na0te8k6oESE/ct3YMfurTYYR3cU9qnMmmBalOKZig==
   dependencies:
     axios "^0.21.1"
     loglevel "^1.7.1"
