@@ -22,15 +22,15 @@ import images from '../images/*.*';
 import STOP_WORDS from './utils/stop_words.json';
 
 // Source: https://stackoverflow.com/a/901144/123545
-const queryParams = new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
+const anchorParams = new Proxy(new URLSearchParams(window.location.hash.replace('#', '')), {
+  get: (anchorParams, prop) => anchorParams.get(prop),
 });
 
 let TYPESENSE_SERVER_CONFIG = {
   apiKey: process.env.TYPESENSE_SEARCH_ONLY_API_KEY, // Be sure to use an API key that only allows searches, in production
   nodes: [
     {
-      host: queryParams.host ? queryParams.host : process.env.TYPESENSE_HOST,
+      host: anchorParams.host ? anchorParams.host : process.env.TYPESENSE_HOST,
       port: process.env.TYPESENSE_PORT,
       protocol: process.env.TYPESENSE_PROTOCOL,
     },
@@ -54,7 +54,7 @@ let TYPESENSE_SERVER_CONFIG = {
 
 if (process.env[`TYPESENSE_HOST_2`]) {
   TYPESENSE_SERVER_CONFIG.nodes.push({
-    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_2`],
+    host: anchorParams.host ? anchorParams.host : process.env[`TYPESENSE_HOST_2`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   });
@@ -62,7 +62,7 @@ if (process.env[`TYPESENSE_HOST_2`]) {
 
 if (process.env[`TYPESENSE_HOST_3`]) {
   TYPESENSE_SERVER_CONFIG.nodes.push({
-    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_3`],
+    host: anchorParams.host ? anchorParams.host : process.env[`TYPESENSE_HOST_3`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   });
@@ -70,7 +70,7 @@ if (process.env[`TYPESENSE_HOST_3`]) {
 
 if (process.env[`TYPESENSE_HOST_NEAREST`]) {
   TYPESENSE_SERVER_CONFIG['nearestNode'] = {
-    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_NEAREST`],
+    host: anchorParams.host ? anchorParams.host : process.env[`TYPESENSE_HOST_NEAREST`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   };
