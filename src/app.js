@@ -21,11 +21,16 @@ import {SearchClient as TypesenseSearchClient} from 'typesense'; // To get the t
 import images from '../images/*.*';
 import STOP_WORDS from './utils/stop_words.json';
 
+// Source: https://stackoverflow.com/a/901144/123545
+const queryParams = new Proxy(new URLSearchParams(window.location.search), {
+  get: (searchParams, prop) => searchParams.get(prop),
+});
+
 let TYPESENSE_SERVER_CONFIG = {
   apiKey: process.env.TYPESENSE_SEARCH_ONLY_API_KEY, // Be sure to use an API key that only allows searches, in production
   nodes: [
     {
-      host: process.env.TYPESENSE_HOST,
+      host: queryParams.host ? queryParams.host : process.env.TYPESENSE_HOST,
       port: process.env.TYPESENSE_PORT,
       protocol: process.env.TYPESENSE_PROTOCOL,
     },
