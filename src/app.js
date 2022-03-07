@@ -54,7 +54,7 @@ let TYPESENSE_SERVER_CONFIG = {
 
 if (process.env[`TYPESENSE_HOST_2`]) {
   TYPESENSE_SERVER_CONFIG.nodes.push({
-    host: process.env[`TYPESENSE_HOST_2`],
+    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_2`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   });
@@ -62,7 +62,7 @@ if (process.env[`TYPESENSE_HOST_2`]) {
 
 if (process.env[`TYPESENSE_HOST_3`]) {
   TYPESENSE_SERVER_CONFIG.nodes.push({
-    host: process.env[`TYPESENSE_HOST_3`],
+    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_3`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   });
@@ -70,7 +70,7 @@ if (process.env[`TYPESENSE_HOST_3`]) {
 
 if (process.env[`TYPESENSE_HOST_NEAREST`]) {
   TYPESENSE_SERVER_CONFIG['nearestNode'] = {
-    host: process.env[`TYPESENSE_HOST_NEAREST`],
+    host: queryParams.host ? queryParams.host : process.env[`TYPESENSE_HOST_NEAREST`],
     port: process.env.TYPESENSE_PORT,
     protocol: process.env.TYPESENSE_PROTOCOL,
   };
