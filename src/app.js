@@ -36,7 +36,7 @@ let TYPESENSE_SERVER_CONFIG = {
     },
   ],
   numRetries: 8,
-  useServerSideSearchCache: true,
+  useServerSideSearchCache: false,
 };
 
 // [2, 3].forEach(i => {
@@ -80,7 +80,10 @@ const INDEX_NAME = process.env.TYPESENSE_COLLECTION_NAME;
 
 async function getIndexSize() {
   let typesenseSearchClient = new TypesenseSearchClient(
-    TYPESENSE_SERVER_CONFIG
+    {
+      ...TYPESENSE_SERVER_CONFIG,
+      useServerSideSearchCache: true
+    }
   );
   let results = await typesenseSearchClient
     .collections(INDEX_NAME)
