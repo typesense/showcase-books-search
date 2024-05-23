@@ -1,10 +1,10 @@
 module.exports = {
-  extends: 'prettier',
+  extends: "prettier",
   env: {
-    'jquery': true,
-    'es6': true,
+    jquery: true,
+    es6: true,
   },
-  'parserOptions': {
-    'sourceType': 'module',
+  parserOptions: {
+    sourceType: "module",
   },
 };
