@@ -1,10 +1,7 @@
 import jQuery from "jquery";
 
 window.$ = jQuery; // workaround for https://github.com/parcel-bundler/parcel/issues/333
-
-import "popper.js";
 import "bootstrap";
-
 import instantsearch from "instantsearch.js/es";
 import {
   searchBox,
@@ -219,7 +216,7 @@ search.addWidgets([
     placeholder: "Type in a book title or author",
     autofocus: true,
     cssClasses: {
-      input: "form-control",
+      input: "form-control searchbox-input",
     },
     queryHook(query, search) {
       const modifiedQuery = queryWithoutStopWords(query);
@@ -259,9 +256,7 @@ search.addWidgets([
     },
     templates: {
       item: (hit, { html, components }) => html`
-        <h6
-          class="text-primary font-weight-light font-letter-spacing-loose mb-0"
-        >
+        <h6 class="text-primary fw-light font-letter-spacing-loose mb-0">
           <a href="https://openlibrary.org/${hit.id}" target="_blank">
             ${components.Highlight({ hit, attribute: "title" })}
           </a>
@@ -272,10 +267,10 @@ search.addWidgets([
             ${components.Highlight({ hit, attribute: "author" })}
           </a>
         </div>
-        <div class="mt-auto text-right">
+        <div class="mt-auto text-end">
           ${hit.urls.map(
             (item) =>
-              html` <a class="ml-2" href="${item.url}" target="_blank"
+              html` <a class="ms-2" href="${item.url}" target="_blank"
                 ><img
                   class="mt-${item.topMargin}"
                   src="${item.icon}"
@@ -310,9 +305,9 @@ search.addWidgets([
       searchableReset: "d-none",
       showMore: "btn btn-secondary btn-sm align-content-center",
       list: "list-unstyled",
-      count: "badge badge-light bg-light-2 ml-2",
-      label: "d-flex align-items-center text-capitalize",
-      checkbox: "mr-2",
+      count: "badge bg-light text-bg-light ms-2",
+      label: "d-flex align-items-center text-capitalize mb-2",
+      checkbox: "me-2",
     },
   }),
   refinementList({
@@ -328,9 +323,9 @@ search.addWidgets([
       searchableReset: "d-none",
       showMore: "btn btn-secondary btn-sm align-content-center",
       list: "list-unstyled",
-      count: "badge badge-light bg-light-2 ml-2",
-      label: "d-flex align-items-center text-capitalize",
-      checkbox: "mr-2",
+      count: "badge bg-light text-bg-light ms-2",
+      label: "d-flex align-items-center text-capitalize mb-2",
+      checkbox: "me-2",
     },
   }),
   sortBy({
@@ -340,7 +335,7 @@ search.addWidgets([
       { label: "Oldest first", value: `${INDEX_NAME}/sort/publish_date:asc` },
     ],
     cssClasses: {
-      select: "custom-select custom-select-sm",
+      select: "form-select form-select-sm",
     },
   }),
   configure({
@@ -352,9 +347,9 @@ search.addWidgets([
       list: "list-unstyled",
       label: "d-none",
       item: "h5",
-      category: "badge badge-light bg-light-2 px-3 m-2",
+      category: "badge bg-light text-bg-light px-3 m-2",
       categoryLabel: "text-capitalize",
-      delete: "btn btn-sm btn-link p-0 pl-2",
+      delete: "btn btn-sm btn-link p-0 ps-2",
     },
     transformItems: (items) => {
       const modifiedItems = items.map((item) => {
