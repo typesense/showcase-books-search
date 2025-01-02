@@ -11,11 +11,12 @@ import {
   infiniteHits,
   configure,
   stats,
-  analytics,
   refinementList,
   sortBy,
   currentRefinements,
 } from "instantsearch.js/es/widgets";
+import { history } from "instantsearch.js/es/lib/routers";
+
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import { SearchClient as TypesenseSearchClient } from "typesense"; // To get the total number of docs
 import images from "../images/*.*";
@@ -175,16 +176,38 @@ const searchClient = typesenseInstantsearchAdapter.searchClient;
 const search = instantsearch({
   searchClient,
   indexName: INDEX_NAME,
-  routing: true,
-  searchFunction(helper) {
-    if (helper.state.query === "") {
+  routing: {
+    router: history({ cleanUrlOnDispose: true }),
+  },
+  onStateChange({ uiState, setUiState }) {
+    if (uiState[INDEX_NAME].query === "") {
       $("#results-section").addClass("d-none");
     } else {
       $("#results-section").removeClass("d-none");
-      helper.search();
+      setUiState(uiState);
     }
   },
+  future: {
+    preserveSharedStateOnUnmount: true,
+  },
 });
+
+const analyticsMiddleware = () => {
+  return {
+    onStateChange() {
+      window.ga(
+        "set",
+        "page",
+        (window.location.pathname + window.location.search).toLowerCase()
+      );
+      window.ga("send", "pageView");
+    },
+    subscribe() {},
+    unsubscribe() {},
+  };
+};
+
+search.use(analyticsMiddleware);
 
 let debounceTimerId;
 
@@ -206,17 +229,6 @@ search.addWidgets([
         }
         debounceTimerId = setTimeout(() => search(modifiedQuery), 250);
       }
-    },
-  }),
-
-  analytics({
-    pushFunction() {
-      window.ga(
-        "set",
-        "page",
-        (window.location.pathname + window.location.search).toLowerCase()
-      );
-      window.ga("send", "pageView");
     },
   }),
 
@@ -246,23 +258,35 @@ search.addWidgets([
       loadMore: "btn btn-primary mx-auto d-block mt-4",
     },
     templates: {
-      item: `
-            <h6 class="text-primary font-weight-light font-letter-spacing-loose mb-0">
-              <a href="https://openlibrary.org/{{ id }}" target="_blank">
-                {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
-              </a>
-            </h6>
-            <div class="text-muted">
-              by
-              <a role="button" class="clickable-search-term">{{#helpers.highlight}}{ "attribute": "author" }{{/helpers.highlight}}</a>
-            </div>
-            <div class="mt-auto text-right">
-              {{#urls}}
-              <a class="ml-2" href="{{ url }}" target="_blank" ><img class="mt-{{topMargin}}" src="{{ icon }}" alt="{{ type }}" height="14"></a>
-              {{/urls}}
-            </div>
-        `,
-      empty: "No books found for <q>{{ query }}</q>. Try another search term.",
+      item: (hit, { html, components }) => html`
+        <h6
+          class="text-primary font-weight-light font-letter-spacing-loose mb-0"
+        >
+          <a href="https://openlibrary.org/${hit.id}" target="_blank">
+            ${components.Highlight({ hit, attribute: "title" })}
+          </a>
+        </h6>
+        <div class="text-muted">
+          by ${" "}
+          <a role="button" class="clickable-search-term">
+            ${components.Highlight({ hit, attribute: "author" })}
+          </a>
+        </div>
+        <div class="mt-auto text-right">
+          ${hit.urls.map(
+            (item) =>
+              html` <a class="ml-2" href="${item.url}" target="_blank"
+                ><img
+                  class="mt-${item.topMargin}"
+                  src="${item.icon}"
+                  alt="${item.type}"
+                  height="14"
+              /></a>`
+          )}
+        </div>
+      `,
+      empty: (state, { html }) =>
+        html`No books found for <q>${state.query}</q>. Try another search term.`,
     },
     transformItems: (items) => {
       return items.map((item) => {
@@ -365,11 +389,10 @@ search.start();
 
 $(function () {
   const $searchBox = $("#searchbox input[type=search]");
-  // Set initial search term
-  // if ($searchBox.val().trim() === '') {
-  //   $searchBox.val('book');
-  //   search.helper.setQuery($searchBox.val()).search();
-  // }
+  // Search on page refresh with the query restored from URL params
+  if ($searchBox.val().trim() !== "") {
+    search.helper.setQuery($searchBox.val()).search();
+  }
 
   // Handle example search terms
   $(".clickable-search-term").on("click", handleSearchTermClick);
