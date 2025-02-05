@@ -55,22 +55,26 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
   gzip_reader.each_line.each_slice(BATCH_SIZE) do |lines|
     book_records_batch = lines.map do |line|
       line_number += 1
-
-      parsed_record = Oj.load(line.split("\t")[4], mode: :compat)
-      record_type = parsed_record['type']['key']
-      next unless record_type == '/type/edition'
-
-      publish_date = determine_publish_date(parsed_record)
-      title = determine_title(parsed_record)
-
-      if title.nil?
-        puts 'Skipping record with no title...'
-        ap parsed_record
-        puts line
-        next
-      end
-
       begin
+        fields = line.split("\t")
+        next if fields.length < 5 || fields[4].nil? || fields[4].strip.empty?
+
+        parsed_record = Oj.load(fields[4], mode: :compat)
+        next if parsed_record.nil? || !parsed_record.is_a?(Hash) || !parsed_record['type'].is_a?(Hash)
+        
+        record_type = parsed_record['type']['key']
+        next unless record_type == '/type/edition'
+
+        publish_date = determine_publish_date(parsed_record)
+        title = determine_title(parsed_record)
+
+        if title.nil?
+          puts 'Skipping record with no title...'
+          ap parsed_record
+          puts line
+          next
+        end
+
         {
           'id' => parsed_record['key'],
           'title' => title,
@@ -80,10 +84,9 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
           'author' => (parsed_record['authors'] || []).map { |a| authors[a['key']] }.compact.first
         }.compact
       rescue StandardError => e
-        ap parsed_record
-        ap e
-        ap e.backtrace.join("\n")
-        raise
+        puts "Error processing line #{line_number}: #{e.message}"
+        puts "Record: #{line}"
+        nil
       end
     end.compact
 

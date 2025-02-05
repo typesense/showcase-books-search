@@ -18,17 +18,25 @@ File.open(OUTPUT_FILE, 'w') do |output_file|
   gzip_reader.each_line.each_slice(BATCH_SIZE) do |lines|
     authors_records_batch = lines.map do |line|
       line_number += 1
-      parsed_record = Oj.load(line.split("\t")[4])
-      record_type = parsed_record['type']['key']
-      record_key = parsed_record['key']
-      record_name = parsed_record['name']
+      begin
+        fields = line.split("\t")
+        next if fields.length < 5 || fields[4].nil? || fields[4].strip.empty?
+        
+        parsed_record = Oj.load(fields[4])
+        record_type = parsed_record['type']['key']
+        record_key = parsed_record['key']
+        record_name = parsed_record['name']
 
-      next unless record_type == '/type/author'
+        next unless record_type == '/type/author'
 
-      {
-        'key' => record_key,
-        'name' => record_name
-      }
+        {
+          'key' => record_key,
+          'name' => record_name
+        }
+      rescue => e
+        puts "Error processing line #{line_number}: #{e.message}"
+        nil
+      end
     end.compact
 
     jsonl_string = authors_records_batch.map { |r| Oj.dump(r) }.join("\n")
